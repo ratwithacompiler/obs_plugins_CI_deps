@@ -1,7 +1,6 @@
 if exist dependencies2017.zip (curl -kLO https://cdn-fastly.obsproject.com/downloads/dependencies2017.zip -f --retry 5 -z dependencies2017.zip) else (curl -kLO https://cdn-fastly.obsproject.com/downloads/dependencies2017.zip -f --retry 5 -C -)
 7z x dependencies2017.zip -odependencies2017
 
-
 dir
 dir dependencies2017
 
@@ -39,4 +38,3 @@ cd ..
 
 dir
 cd ..
-

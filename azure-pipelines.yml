@@ -3,31 +3,6 @@
 
 jobs:
 
-- job: 'Build_macOS'
-  pool:
-    vmImage: 'macos-10.13'
-  steps:
-    - script: git submodule update --init --recursive
-      displayName: 'Checkout Submodules'
-
-    - script: ./install-script-osx.sh
-      displayName: 'Setup build'
-
-    - bash: |
-        pwd
-        cd ./obs_src/build
-        make -j4
-        cd -
-      displayName: 'Build'
-
-    - script: ./post-install-script-osx.sh
-      displayName: 'Post install'
-
-    - task: PublishPipelineArtifact@1
-      inputs:
-        path: './archive_osx.zip'
-        artifact: obs_deps_macos
-
 - job: 'Build_Windows'
   pool:
     vmImage: 'vs2017-win2016'
@@ -48,11 +23,10 @@ jobs:
       msbuildArguments: '/m /p:Configuration=RelWithDebInfo'
       solution: .\obs_src\build_32\obs-studio.sln
 
-  - script: ./post-install-script-win.cmd
-    displayName: 'Pack archive'
+#  - script: ./post-install-script-win.cmd
+#    displayName: ''
 
   - task: PublishPipelineArtifact@1
     inputs:
-      path: './archive.7z'
+      path: './'
       artifact: obs_deps_windows
-

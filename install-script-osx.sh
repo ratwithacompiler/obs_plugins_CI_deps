@@ -39,10 +39,9 @@ find ./
 
 export PATH=/usr/local/opt/ccache/libexec:$PATH
 
-cd obs_src
 
-mkdir build
-cd build
+mkdir obs_src/build
+cd obs_src/build
 
 cmake  \
 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.11 \
@@ -52,8 +51,19 @@ cmake  \
 -DDISABLE_PYTHON=ON \
 -DBUILD_CAPTIONS=ON ..
 
-cd ../
-cd ../
+make -j4
+
+cd ../../
+pwd
+
 
 find ./
-pwd
+
+mv -vn /usr/local/Cellar/qt/5.10.1 qt_dep
+
+#zip -u -4 -r ./archive_osx.zip obs_src
+#zip -u -4 -r ./archive_osx.zip qt_dep
+#zip -u -4 -r ./archive_osx.zip osx_deps
+
+mkdir output
+mv -vn obs_src qt_dep osx_deps output/

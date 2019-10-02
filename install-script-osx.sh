@@ -35,7 +35,6 @@ mkdir osx_deps/
 tar -xf ./osx-deps-2018-08-09.tar.gz -C osx_deps/
 
 pwd
-find ./
 
 export PATH=/usr/local/opt/ccache/libexec:$PATH
 
@@ -57,13 +56,7 @@ cd ../../
 pwd
 
 
-find ./
-
 mv -vn /usr/local/Cellar/qt/5.10.1 qt_dep
-
-#zip -u -4 -r ./archive_osx.zip obs_src
-#zip -u -4 -r ./archive_osx.zip qt_dep
-#zip -u -4 -r ./archive_osx.zip osx_deps
 
 mkdir output
 mv -vn obs_src qt_dep osx_deps output/

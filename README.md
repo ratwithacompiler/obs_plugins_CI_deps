@@ -2,11 +2,6 @@
 
 creates azure artifacts containing all needed OBS plugin build dependencies
 
- Windows Archive:
-* OBS 23.2.1 source code
-* OBS Windows 32 and 64bit builds
-* extracted OBS Qt and win dependencies
-
 MacOS Archive
 * OBS 23.2.1 source code
 * build of it 

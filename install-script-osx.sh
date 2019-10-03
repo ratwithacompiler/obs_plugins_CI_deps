@@ -6,54 +6,83 @@ hr() {
   echo "───────────────────────────────────────────────────"
 }
 
+
 # Exit if something fails
 set -e
 
 # Echo all commands before executing
 set -v
 
-pwd
+for arg in "$@"; do
+    if [ "$arg" == '--install-deps' ]; then
+        echo installing deps;
+        brew install gcc6
+    fi
+done
 
-# just clone the version tag we care about
-git clone --branch 23.2.1 --single-branch --depth 1 --recursive https://github.com/obsproject/obs-studio.git obs_src
 
-brew update
+if [ ! -d "vcpkg" ]; then
+    echo "install vcpkg"
+    git clone https://github.com/Microsoft/vcpkg.git
+    cd vcpkg
+    git reset --hard a528ee4b856d0d73b6b837dfa7ab2e745d02b5ca #grpc 1.23.1, protobuf 3.10.0
+    ./bootstrap-vcpkg.sh
+    echo done
+    cd ..
+fi
 
-#Base OBS Deps and ccache
-brew install jack speexdsp ccache mbedtls clang-format
-brew install https://gist.githubusercontent.com/DDRBoxman/b3956fab6073335a4bf151db0dcbd4ad/raw/ed1342a8a86793ea8c10d8b4d712a654da121ace/qt.rb
-brew install https://gist.githubusercontent.com/DDRBoxman/4cada55c51803a2f963fa40ce55c9d3e/raw/572c67e908bfbc1bcb8c476ea77ea3935133f5b5/swig.rb
+cd vcpkg
 
-export PATH=/usr/local/opt/ccache/libexec:$PATH
-ccache -s || echo "CCache is not available."
+echo
+echo installing grpc
+./vcpkg install grpc
+echo done
 
-# Fetch and untar prebuilt OBS deps that are compatible with older versions of OSX
-hr "Downloading OBS deps"
-wget --quiet --retry-connrefused --waitretry=1 https://obs-nightly.s3.amazonaws.com/osx-deps-2018-08-09.tar.gz
+echo
+echo fetching googleapis
 
-mkdir osx_deps/
-tar -xf ./osx-deps-2018-08-09.tar.gz -C osx_deps/
+protoc_path="$(pwd)/installed/x64-osx/tools/protobuf/protoc"
+protoc_include="$(pwd)/installed/x64-osx/include/"
 
-pwd
-find ./
+grpc_cpp_path="$(pwd)/installed/x64-osx/tools/grpc/grpc_cpp_plugin"
 
-export PATH=/usr/local/opt/ccache/libexec:$PATH
+echo "protoc_path = $protoc_path"
+echo "protoc_include = $protoc_include"
+echo "grpc_cpp_path = $grpc_cpp_path"
 
-cd obs_src
 
-mkdir build
-cd build
 
-cmake  \
--DCMAKE_OSX_DEPLOYMENT_TARGET=10.11 \
--DQTDIR=/usr/local/Cellar/qt/5.10.1 \
--DDepsPath=$PWD/../../osx_deps/obsdeps \
--DENABLE_SCRIPTING=OFF \
--DDISABLE_PYTHON=ON \
--DBUILD_CAPTIONS=ON ..
+if [ ! -d "googleapis" ]; then
+    echo checking out repo
+    git clone --single-branch --branch "master" "https://github.com/googleapis/googleapis"
+
+    cd googleapis
+    git reset --hard a1b85caabafb4669e5b40ef38b7d663856ab50f9
+    pwd
+
+    #wget -c "https://github.com/googleapis/googleapis/archive/a1b85caabafb4669e5b40ef38b7d663856ab50f9.zip"
+    #unzip a1b85caabafb4669e5b40ef38b7d663856ab50f9.zip
+
+else
+   echo skipping checkout, exists already
+   cd googleapis
+   pwd
+fi
+echo
+echo
+echo making googleapis
+
+#mkdir -p gens
+#rm -rf gens
+
+make GRPCPLUGIN="$grpc_cpp_path" PROTOC="$protoc_path" PROTOINCLUDE="$protoc_include" LANGUAGE=cpp clean || true
+make GRPCPLUGIN="$grpc_cpp_path" PROTOC="$protoc_path" PROTOINCLUDE="$protoc_include" LANGUAGE=cpp all
 
 cd ../
-cd ../
+echo
+echo done
 
-find ./
-pwd
+
+mkdir output
+mv -vn googleapis output/
+mv -vn installed/x64-osx output/

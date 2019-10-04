@@ -3,56 +3,20 @@
 
 jobs:
 
-- job: 'Build_macOS'
-  pool:
-    vmImage: 'macos-10.13'
-  steps:
-    - script: git submodule update --init --recursive
-      displayName: 'Checkout Submodules'
-
-    - script: ./install-script-osx.sh
-      displayName: 'Setup build'
-
-    - bash: |
-        pwd
-        cd ./obs_src/build
-        make -j4
-        cd -
-      displayName: 'Build'
-
-    - script: ./post-install-script-osx.sh
-      displayName: 'Post install'
-
-    - task: PublishPipelineArtifact@1
-      inputs:
-        path: './archive_osx.zip'
-        artifact: obs_deps_macos
-
 - job: 'Build_Windows'
+  timeoutInMinutes: 780
+  cancelTimeoutInMinutes: 1
+
   pool:
     vmImage: 'vs2017-win2016'
+
   steps:
-
-  - script: ./install-script-win.cmd
-    displayName: 'Download / Setup Deps / Run CMake'
-
-  - task: MSBuild@1
-    displayName: 'Build 64-bit'
-    inputs:
-      msbuildArguments: '/m /p:Configuration=RelWithDebInfo'
-      solution: .\obs_src\build_64\obs-studio.sln
-
-  - task: MSBuild@1
-    displayName: 'Build 32-bit'
-    inputs:
-      msbuildArguments: '/m /p:Configuration=RelWithDebInfo'
-      solution: .\obs_src\build_32\obs-studio.sln
-
-  - script: ./post-install-script-win.cmd
-    displayName: 'Pack archive'
+  - script: 'mkdir C:\workdir_tmp\'
+  - script: $(Build.SourcesDirectory)/install-script-win.cmd
+    displayName: 'Windows GRPC'
+    workingDirectory: 'C:\workdir_tmp\'
 
   - task: PublishPipelineArtifact@1
     inputs:
-      path: './archive.7z'
-      artifact: obs_deps_windows
-
+      path: 'C:\workdir_tmp\output_dir'
+      artifact: grpc_deps_windows

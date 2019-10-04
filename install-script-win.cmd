@@ -1,42 +1,65 @@
-if exist dependencies2017.zip (curl -kLO https://cdn-fastly.obsproject.com/downloads/dependencies2017.zip -f --retry 5 -z dependencies2017.zip) else (curl -kLO https://cdn-fastly.obsproject.com/downloads/dependencies2017.zip -f --retry 5 -C -)
-7z x dependencies2017.zip -odependencies2017
+set BASE_DIR=%cd%
+
+echo "workdir %cd%"
+
+git clone https://github.com/Microsoft/vcpkg.git
+cd vcpkg
+cd
+
+REM #grpc 1.23.0, protobuf 3.9.1
+git reset --hard 02dd1ccd62acd15747f7a6a376cecde782f0fdda
+
+REM #grpc 1.23.1, protobuf 3.10.0
+REM git reset --hard a528ee4b856d0d73b6b837dfa7ab2e745d02b5ca
+
+cmd /C bootstrap-vcpkg.bat
+
+vcpkg.exe install grpc:x64-windows grpc:x64-windows-static grpc:x86-windows grpc:x86-windows-static
+REM vcpkg.exe install grpc:x64-windows-static
+REM .\vcpkg.exe install zlib:x64-windows-static
+
+set VCPKG_INSTALLED=%cd%\installed\x64-windows-static
 
 
-dir
-dir dependencies2017
 
-set DepsPath32=%CD%\dependencies2017\win32
-set DepsPath64=%CD%\dependencies2017\win64
 
-del dependencies2017.zip
 
-curl -kLO https://cdn-fastly.obsproject.com/downloads/Qt_5.10.1.7z -f --retry 5 -C -
-7z x Qt_5.10.1.7z -oQt
-del Qt_5.10.1.7z
+echo checking out repo
+git clone --single-branch --branch "master" "https://github.com/googleapis/googleapis"
 
-dir
-dir Qt
+cd googleapis
+git reset --hard a1b85caabafb4669e5b40ef38b7d663856ab50f9
+REM git reset --hard d9576d95b44f64fb0e3da4760adfc4a24fa1faab
 
-set QTDIR32=%CD%\Qt\5.10.1\msvc2017
-set QTDIR64=%CD%\Qt\5.10.1\msvc2017_64
 
-set build_config=RelWithDebInfo
+mkdir gens
 
-:: just clone the version tag we care about
-git clone --branch 23.2.1 --single-branch --depth 1 --recursive https://github.com/obsproject/obs-studio.git obs_src
-cd obs_src
-dir
+SET SCRIPT_PATH=%~dp0
+SET SCRIPT_DIR=%SCRIPT_PATH:~0,-1%
+cmake.exe ^
+-DGOOGLEAPIS_PATH='%cd%' ^
+-DPROTO_INCLUDE_PATH=%VCPKG_INSTALLED%\include ^
+-DPROTOC_PATH=%VCPKG_INSTALLED%\tools\protobuf\protoc.exe ^
+-DPROTOC_CPP_PATH=%VCPKG_INSTALLED%\tools\grpc\grpc_cpp_plugin.exe ^
+-P "%SCRIPT_DIR%\CMakeLists.txt"
 
-mkdir build_32 build_64
-
-cd ./build_32
-cmake -G "Visual Studio 15 2017" -DCOPIED_DEPENDENCIES=false -DCOPY_DEPENDENCIES=true -DBUILD_CAPTIONS=true ..
+cd
 cd ..
-
-cd ./build_64
-cmake -G "Visual Studio 15 2017 Win64" -DCOPIED_DEPENDENCIES=false -DCOPY_DEPENDENCIES=true -DBUILD_CAPTIONS=true ..
-cd ..
-
+cd
 dir
-cd ..
 
+
+
+mkdir output_dir
+move googleapis output_dir\
+
+move installed\x64-windows output_dir
+move installed\x64-windows-static output_dir
+
+move installed\x86-windows output_dir
+move installed\x86-windows-static output_dir
+
+move output_dir ../
+cd ..
+cd
+dir

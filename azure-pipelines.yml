@@ -3,17 +3,19 @@
 
 jobs:
 
-- job: 'Build_macOS'
+- job: 'Build_Linux'
+
   pool:
-    vmImage: 'macos-10.13'
+    vmImage: 'ubuntu-16.04'
+
   steps:
     - script: git submodule update --init --recursive
       displayName: 'Checkout Submodules'
 
-    - script: ./install-script-osx.sh
-      displayName: 'Setup build'
+    - script: ./install-script-linux.sh
+      displayName: 'Setup & Build'
 
     - task: PublishPipelineArtifact@1
       inputs:
         path: 'output/'
-        artifact: obs_deps_macos
+        artifact: obs_deps_linux

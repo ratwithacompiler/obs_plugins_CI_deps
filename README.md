@@ -3,7 +3,7 @@
 creates azure artifacts containing all needed OBS plugin build dependencies
 
 MacOS Archive
-* OBS 23.2.1 source code
+    * OBS 24.? source code
 * build of it 
 * extracted OBS Qt and mac dependencies 
 

@@ -22,7 +22,7 @@ set QTDIR64=%CD%\Qt\5.10.1\msvc2017_64
 set build_config=RelWithDebInfo
 
 :: just clone the version tag we care about
-git clone --branch 23.2.1 --single-branch --depth 1 --recursive https://github.com/obsproject/obs-studio.git obs_src
+git clone --branch 24.0.4 --single-branch --depth 1 --recursive https://github.com/obsproject/obs-studio.git obs_src
 cd obs_src
 dir
 

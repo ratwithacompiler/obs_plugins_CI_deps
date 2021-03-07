@@ -9,24 +9,12 @@ jobs:
   steps:
 
   - script: ./install-script-win.cmd
-    displayName: 'Download / Setup Deps / Run CMake'
-
-  - task: MSBuild@1
-    displayName: 'Build 64-bit'
-    inputs:
-      msbuildArguments: '/m /p:Configuration=RelWithDebInfo'
-      solution: .\obs_src\build_64\obs-studio.sln
-
-  - task: MSBuild@1
-    displayName: 'Build 32-bit'
-    inputs:
-      msbuildArguments: '/m /p:Configuration=RelWithDebInfo'
-      solution: .\obs_src\build_32\obs-studio.sln
-
-#  - script: ./post-install-script-win.cmd
-#    displayName: ''
+    displayName: 'Build OBSs'
+    workingDirectory: $(Build.SourcesDirectory)
+    env:
+      PRUNE_BUILDS: "YES"
 
   - task: PublishPipelineArtifact@1
     inputs:
-      path: './'
+      path: $(Build.SourcesDirectory)
       artifact: obs_deps_windows

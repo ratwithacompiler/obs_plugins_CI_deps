@@ -3,7 +3,7 @@
 creates azure artifacts containing all needed OBS plugin build dependencies
 
  Windows Archive:
-* OBS 26.0.2 source code
+* OBS somewhere between 26.1 and 27 source code
 * OBS Windows 32 and 64bit builds
 * extracted OBS Qt and win dependencies
 

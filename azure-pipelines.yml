@@ -7,7 +7,7 @@ jobs:
   timeoutInMinutes: 780
   cancelTimeoutInMinutes: 1
   pool:
-    vmImage: 'macos-10.13'
+    vmImage: 'macos-10.15'
   steps:
     - script: ./install-script-osx.sh --install-deps
       displayName: 'create grpc deps'

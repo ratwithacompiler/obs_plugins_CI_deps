@@ -1,39 +1,49 @@
 set BASE_DIR=%cd%
+echo workdir: %cd%
+echo VC_INSTALL_PKG: %VC_INSTALL_PKG%
+echo VC_COMMIT: %VC_COMMIT%
+echo GOOGLE_APIS_COMMIT: %GOOGLE_APIS_COMMIT%
+echo
 
-echo "workdir %cd%"
+IF NOT DEFINED VC_INSTALL_PKG (
+    echo ERROR: missing VC_INSTALL_PKG
+    exit 1
+)
+
+IF NOT DEFINED VC_COMMIT (
+    echo ERROR: missing VC_COMMIT
+    exit 1
+)
+
+IF NOT DEFINED GOOGLE_APIS_COMMIT (
+    echo ERROR: missing GOOGLE_APIS_COMMIT
+    exit 1
+)
 
 git clone https://github.com/Microsoft/vcpkg.git
 cd vcpkg
 cd
 
-REM #grpc 1.23.0, protobuf 3.9.1
-git reset --hard 02dd1ccd62acd15747f7a6a376cecde782f0fdda
+set "triplet=%VC_INSTALL_PKG:*:=%"
+set VCPKG_INSTALLED=%cd%\installed\%triplet%
+echo VCPKG_INSTALLED: %VCPKG_INSTALLED%
 
-REM #grpc 1.23.1, protobuf 3.10.0
-REM git reset --hard a528ee4b856d0d73b6b837dfa7ab2e745d02b5ca
-
+git reset --hard %VC_COMMIT%
 cmd /C bootstrap-vcpkg.bat
 
-vcpkg.exe install grpc:x64-windows grpc:x64-windows-static grpc:x86-windows grpc:x86-windows-static
-REM vcpkg.exe install grpc:x64-windows-static
-REM .\vcpkg.exe install zlib:x64-windows-static
+if %VC_RELEASE_ONLY% == YES (
+    echo VC_RELEASE_ONLY, using VCPKG_BUILD_TYPE release
+)
+if %VC_RELEASE_ONLY% == YES echo.set(VCPKG_BUILD_TYPE release)>> triplets\%triplet%.cmake
 
-set VCPKG_INSTALLED=%cd%\installed\x64-windows-static
+vcpkg.exe install %VC_INSTALL_PKG%
 
-
-
-
-
-echo checking out repo
-git clone --single-branch --branch "master" "https://github.com/googleapis/googleapis"
-
+echo checking out googleapis repo
+git clone --single-branch --branch master https://github.com/googleapis/googleapis
 cd googleapis
-git reset --hard a1b85caabafb4669e5b40ef38b7d663856ab50f9
-REM git reset --hard d9576d95b44f64fb0e3da4760adfc4a24fa1faab
-
+git reset --hard %GOOGLE_APIS_COMMIT%
 
 mkdir gens
-
 SET SCRIPT_PATH=%~dp0
 SET SCRIPT_DIR=%SCRIPT_PATH:~0,-1%
 cmake.exe ^
@@ -41,23 +51,21 @@ cmake.exe ^
 -DPROTO_INCLUDE_PATH=%VCPKG_INSTALLED%\include ^
 -DPROTOC_PATH=%VCPKG_INSTALLED%\tools\protobuf\protoc.exe ^
 -DPROTOC_CPP_PATH=%VCPKG_INSTALLED%\tools\grpc\grpc_cpp_plugin.exe ^
--P "%SCRIPT_DIR%\CMakeLists.txt"
-
+-P %SCRIPT_DIR%\CMakeLists.txt
+REM
 cd
 cd ..
 cd
 dir
 
-
-
 mkdir output_dir
 move googleapis output_dir\
 
-move installed\x64-windows output_dir
-move installed\x64-windows-static output_dir
-
-move installed\x86-windows output_dir
-move installed\x86-windows-static output_dir
+vcpkg.exe export --x-all-installed --raw --output=output_dir\vcpkg_export
+if %VC_RELEASE_ONLY% == YES (
+    echo delete output_dir\vcpkg_export\installed\%triplet%\debug
+    tree output_dir\vcpkg_export\installed\%triplet%\debug
+)
 
 move output_dir ../
 cd ..

@@ -14,17 +14,19 @@ set -v
 
 pwd
 
-# just clone the version tag we care about
-git clone --branch LinuxCaptionFix --single-branch --depth 1 --recursive https://github.com/ioangogo/obs-studio.git obs_src
+git clone --branch master --single-branch https://github.com/obsproject/obs-studio.git obs_src
+cd obs_src
+
+git reset --hard 3bc4e8ecbab768b3a700aba2d34fc2364179f6f2
+git submodule update --init --recursive
 
 hr "install CI deps"
-./obs_src/CI/install-dependencies-linux.sh
+./CI/install-dependencies-linux.sh || true #ignore error because of failed CEF download attempt
 
-cd obs_src
 mkdir build
 cd build
 
-cmake .. -DBUILD_CAPTIONS=ON -DUNIX_STRUCTURE=1
+cmake .. -DUNIX_STRUCTURE=1
 make -j4
 
 cd ../../

@@ -9,10 +9,24 @@ jobs:
   pool:
     vmImage: 'macos-10.15'
   steps:
-    - script: ./install-script-osx.sh --install-deps
+    - script: ./install-script.sh --install-deps
       displayName: 'create grpc deps'
 
     - task: PublishPipelineArtifact@1
       inputs:
         path: 'vcpkg/output/'
-        artifact: grpc_deps_macos
+        artifact: grpc_deps_macos_x64
+
+- job: 'Build_Linux'
+  timeoutInMinutes: 780
+  cancelTimeoutInMinutes: 1
+  pool:
+    vmImage: 'ubuntu-18.04'
+  steps:
+    - script: ./install-script.sh
+      displayName: 'create grpc deps'
+
+    - task: PublishPipelineArtifact@1
+      inputs:
+        path: 'vcpkg/output/'
+        artifact: grpc_deps_linux_x64

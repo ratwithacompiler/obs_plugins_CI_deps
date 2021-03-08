@@ -37,6 +37,8 @@ cd vcpkg
 ./vcpkg install grpc
 echo done
 VCPKG_DIR="$(pwd)"
+pkg_triplet="$(./vcpkg list grpc |egrep -o '^[a-zA-Z0-9:_-]+'| head -n1 | sed 's/^grpc://')"
+echo "triplet: $pkg_triplet"
 
 echo --------------------------------------------------------------
 echo CREATING GRPC GOOGLEAPIS
@@ -62,9 +64,9 @@ pwd
 echo
 echo building googleapis
 
-protoc_path="$VCPKG_DIR/installed/x64-osx/tools/protobuf/protoc"
-protoc_include="$VCPKG_DIR/installed/x64-osx/include/"
-grpc_cpp_path="$VCPKG_DIR/installed/x64-osx/tools/grpc/grpc_cpp_plugin"
+protoc_path="$VCPKG_DIR/installed/$pkg_triplet/tools/protobuf/protoc"
+protoc_include="$VCPKG_DIR/installed/$pkg_triplet/include/"
+grpc_cpp_path="$VCPKG_DIR/installed/$pkg_triplet/tools/grpc/grpc_cpp_plugin"
 echo "protoc_path: $protoc_path"
 echo "protoc_include: $protoc_include"
 echo "grpc_cpp_path: $grpc_cpp_path"

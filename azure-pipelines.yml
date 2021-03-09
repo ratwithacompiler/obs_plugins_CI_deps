@@ -1,7 +1,7 @@
 # https://aka.ms/yaml
 
 variables:
-  VC_COMMIT: "9b72cad7f0c7c3bc364cb471bf624e6cae3e1aef" #grpc 1.33.1, protobuf 3.14.0
+  VC_COMMIT: "3c7a12bdf3dd6c29c18647919249c083a6fd3346" #grpc 1.33.1, protobuf 3.14.0
   VC_RELEASE_ONLY: YES
   GOOGLE_APIS_COMMIT: "959b0bcea3f542b8d6964c910b11fb847b12a5ad"
 
@@ -29,7 +29,7 @@ jobs:
         inputs:
           path: 'C:\workdir_tmp\output_dir'
           artifact: grpc_deps_windows_x64_static
-
+#
   - job: 'GRPC_x86_windows_static'
     timeoutInMinutes: 780
     cancelTimeoutInMinutes: 1
@@ -53,6 +53,52 @@ jobs:
           path: 'C:\workdir_tmp\output_dir'
           artifact: grpc_deps_windows_x86_static
 
+  - job: 'GRPC_x64_windows_static_md'
+    timeoutInMinutes: 780
+    cancelTimeoutInMinutes: 1
+
+    pool:
+      vmImage: 'windows-2019'
+    steps:
+      - script: 'mkdir C:\workdir_tmp\'
+
+      - script: $(Build.SourcesDirectory)/install-script-win.cmd
+        displayName: 'Windows GRPC'
+        workingDirectory: 'C:\workdir_tmp\'
+        env:
+          VC_INSTALL_PKG: "grpc:x64-windows-static-md"
+          VC_COMMIT: $(VC_COMMIT)
+          VC_RELEASE_ONLY: $(VC_RELEASE_ONLY)
+          GOOGLE_APIS_COMMIT: $(GOOGLE_APIS_COMMIT)
+
+      - task: PublishPipelineArtifact@1
+        inputs:
+          path: 'C:\workdir_tmp\output_dir'
+          artifact: grpc_deps_windows_x64_static_md
+
+  - job: 'GRPC_x86_windows_static_md'
+    timeoutInMinutes: 780
+    cancelTimeoutInMinutes: 1
+
+    pool:
+      vmImage: 'windows-2019'
+    steps:
+      - script: 'mkdir C:\workdir_tmp\'
+
+      - script: $(Build.SourcesDirectory)/install-script-win.cmd
+        displayName: 'Windows GRPC'
+        workingDirectory: 'C:\workdir_tmp\'
+        env:
+          VC_INSTALL_PKG: "grpc:x86-windows-static-md"
+          VC_COMMIT: $(VC_COMMIT)
+          VC_RELEASE_ONLY: $(VC_RELEASE_ONLY)
+          GOOGLE_APIS_COMMIT: $(GOOGLE_APIS_COMMIT)
+
+      - task: PublishPipelineArtifact@1
+        inputs:
+          path: 'C:\workdir_tmp\output_dir'
+          artifact: grpc_deps_windows_x86_static_md
+#
   - job: 'GRPC_x64_windows'
     timeoutInMinutes: 780
     cancelTimeoutInMinutes: 1

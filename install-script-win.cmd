@@ -3,6 +3,8 @@ echo workdir: %cd%
 echo VC_INSTALL_PKG: %VC_INSTALL_PKG%
 echo VC_COMMIT: %VC_COMMIT%
 echo GOOGLE_APIS_COMMIT: %GOOGLE_APIS_COMMIT%
+set VC_Triplet=%VC_INSTALL_PKG:*:=%
+echo triplet: %VC_Triplet%
 echo
 
 IF NOT DEFINED VC_INSTALL_PKG (
@@ -24,19 +26,47 @@ git clone https://github.com/Microsoft/vcpkg.git
 cd vcpkg
 cd
 
-set "triplet=%VC_INSTALL_PKG:*:=%"
-set VCPKG_INSTALLED=%cd%\installed\%triplet%
+set VCPKG_INSTALLED=%cd%\installed\%VC_Triplet%
 echo VCPKG_INSTALLED: %VCPKG_INSTALLED%
+
+SET VC_Trip1=triplets\%VC_Triplet%.cmake
+SET VC_Trip2=triplets\community\%VC_Triplet%.cmake
+
+echo VC_Trip1: %VC_Trip1%
+echo VC_Trip2: %VC_Trip2%
 
 git reset --hard %VC_COMMIT%
 cmd /C bootstrap-vcpkg.bat
 
 if %VC_RELEASE_ONLY% == YES (
     echo VC_RELEASE_ONLY, using VCPKG_BUILD_TYPE release
-)
-if %VC_RELEASE_ONLY% == YES echo.set(VCPKG_BUILD_TYPE release)>> triplets\%triplet%.cmake
 
-vcpkg.exe install %VC_INSTALL_PKG%
+    if exist %VC_Trip1% (
+        echo found!!!!!!!!!: %VC_Trip1%
+        if %VC_RELEASE_ONLY% == YES (
+            echo. >> %VC_Trip1%
+            echo.set(VCPKG_BUILD_TYPE release^)>> %VC_Trip1%
+        )
+        type %VC_Trip1%
+    )
+
+    if exist %VC_Trip2% (
+        echo found!!!!!!!!!: %VC_Trip2%
+        if %VC_RELEASE_ONLY% == YES (
+            echo. >> %VC_Trip2%
+            echo.set(VCPKG_BUILD_TYPE release^)>> %VC_Trip2%
+        )
+        type %VC_Trip2%
+    )
+)
+
+echo installing
+.\vcpkg.exe install %VC_INSTALL_PKG%
+
+if %errorlevel% neq 0 (
+    echo "error installing"
+    exit /b %errorlevel%
+)
 
 echo checking out googleapis repo
 git clone --single-branch --branch master https://github.com/googleapis/googleapis
@@ -63,8 +93,8 @@ move googleapis output_dir\
 
 vcpkg.exe export --x-all-installed --raw --output=output_dir\vcpkg_export
 if %VC_RELEASE_ONLY% == YES (
-    echo delete output_dir\vcpkg_export\installed\%triplet%\debug
-    tree output_dir\vcpkg_export\installed\%triplet%\debug
+    echo delete output_dir\vcpkg_export\installed\%VC_Triplet%\debug
+    tree output_dir\vcpkg_export\installed\%VC_Triplet%\debug
 )
 
 move output_dir ../

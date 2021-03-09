@@ -6,15 +6,25 @@ jobs:
 - job: 'Build_Windows'
   pool:
     vmImage: 'windows-2019'
+
   steps:
+    - task: DownloadPipelineArtifact@2
+      inputs:
+        project: '4b438742-da7e-4123-8cf4-55564485db7e'
+        pipeline: 6
+        buildType: 'specific'
+        buildVersionToDownload: 'latestFromBranch'
+        branchName: "refs/heads/windows_grpc"
+        artifactName: grpc_deps_windows_x64_static
+        targetPath: $(Build.SourcesDirectory)/grpc_deps_x64_static/
 
-  - script: ./install-script-win.cmd
-    displayName: 'Build OBSs'
-    workingDirectory: $(Build.SourcesDirectory)
-    env:
-      PRUNE_BUILDS: "YES"
+    - script: ./install-script-win.cmd
+      displayName: 'run'
+      workingDirectory: $(Build.SourcesDirectory)
 
-  - task: PublishPipelineArtifact@1
-    inputs:
-      path: $(Build.SourcesDirectory)
-      artifact: obs_deps_windows
+    - task: PublishPipelineArtifact@1
+      inputs:
+        path: $(Build.SourcesDirectory)/build/
+        artifact: out
+
+    - script: exit 1

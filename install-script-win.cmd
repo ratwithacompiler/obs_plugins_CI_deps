@@ -1,16 +1,12 @@
 
-dir
-tree
+git clone https://github.com/Microsoft/vcpkg.git
+cd vcpkg
 
-mkdir build
-cd build
+git reset --hard 4783c36f8c04f584ec4d232958afae9d32bc61d5
+cmd /C bootstrap-vcpkg.bat
 
-cmake .. -A X64 -DVCPKG_TARGET_TRIPLET=x64-windows-static ^
--DCMAKE_TOOLCHAIN_FILE=../grpc_deps_x64_static/vcpkg_export/scripts/buildsystems/vcpkg.cmake ^
--DBUILD_SHARED_LIBS=OFF
+.\vcpkg.exe install grpc:x64-windows-static-md
 
-echo building
-cmake --build . --config Release
-dir
 
-cd ..
+
+

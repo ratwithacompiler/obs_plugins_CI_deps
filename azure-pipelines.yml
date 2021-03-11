@@ -8,16 +8,6 @@ jobs:
     vmImage: 'windows-2019'
 
   steps:
-    - task: DownloadPipelineArtifact@2
-      inputs:
-        project: '4b438742-da7e-4123-8cf4-55564485db7e'
-        pipeline: 6
-        buildType: 'specific'
-        buildVersionToDownload: 'latestFromBranch'
-        branchName: "refs/heads/windows_grpc"
-        artifactName: grpc_deps_windows_x64_static
-        targetPath: $(Build.SourcesDirectory)/grpc_deps_x64_static/
-
     - script: ./install-script-win.cmd
       displayName: 'run'
       workingDirectory: $(Build.SourcesDirectory)

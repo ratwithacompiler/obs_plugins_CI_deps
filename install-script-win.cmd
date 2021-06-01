@@ -8,17 +8,17 @@ dir dependencies2019
 set DepsPath32=%CD%\dependencies2019\win32
 set DepsPath64=%CD%\dependencies2019\win64
 
-REM curl -kLO https://cdn-fastly.obsproject.com/downloads/Qt_5.15.2.7z -f --retry 5 -C -
-REM 7z x Qt_5.15.2.7z -oQt
-REM del Qt_5.15.2.7z
-REM set QTDIR32=%CD%\Qt\5.15.2\msvc2019
-REM set QTDIR64=%CD%\Qt\5.15.2\msvc2019_64
+curl -kLO https://cdn-fastly.obsproject.com/downloads/Qt_5.15.2.7z -f --retry 5 -C -
+7z x Qt_5.15.2.7z -oQt
+del Qt_5.15.2.7z
+set QTDIR32=%CD%\Qt\5.15.2\msvc2019
+set QTDIR64=%CD%\Qt\5.15.2\msvc2019_64
 
-curl -kLO https://cdn-fastly.obsproject.com/downloads/Qt_5.10.1.7z -f --retry 5 -C -
-7z x Qt_5.10.1.7z -oQt
-del Qt_5.10.1.7z
-set QTDIR32=%CD%\Qt\5.10.1\msvc2017
-set QTDIR64=%CD%\Qt\5.10.1\msvc2017_64
+REM curl -kLO https://cdn-fastly.obsproject.com/downloads/Qt_5.10.1.7z -f --retry 5 -C -
+REM 7z x Qt_5.10.1.7z -oQt
+REM del Qt_5.10.1.7z
+REM set QTDIR32=%CD%\Qt\5.10.1\msvc2017
+REM set QTDIR64=%CD%\Qt\5.10.1\msvc2017_64
 
 dir
 dir Qt
@@ -26,19 +26,19 @@ dir Qt
 set build_config=RelWithDebInfo
 
 git clone --branch master --single-branch https://github.com/obsproject/obs-studio.git obs_src
-git reset --hard 3bc4e8ecbab768b3a700aba2d34fc2364179f6f2
+git reset --hard 27.0.0
 
 cd obs_src
 dir
 
 mkdir build_32
 cd ./build_32
-cmake -G "Visual Studio 16 2019" -A Win32 -DCMAKE_SYSTEM_VERSION=10.0  -DCOPIED_DEPENDENCIES=false -DCOPY_DEPENDENCIES=true ..
+cmake -G "Visual Studio 16 2019" -A Win32 -DCMAKE_SYSTEM_VERSION=10.0  -DCOPIED_DEPENDENCIES=false -DCOPY_DEPENDENCIES=true -DBUILD_BROWSER=OFF  -DBUILD_VST=OFF ..
 cd ..
 
 mkdir build_64
 cd ./build_64
-cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_SYSTEM_VERSION=10.0 -DCOPIED_DEPENDENCIES=false -DCOPY_DEPENDENCIES=true ..
+cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_SYSTEM_VERSION=10.0 -DCOPIED_DEPENDENCIES=false -DCOPY_DEPENDENCIES=true -DBUILD_BROWSER=OFF -DBUILD_VST=OFF ..
 cd ..
 
 cd

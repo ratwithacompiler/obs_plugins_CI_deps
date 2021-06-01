@@ -17,14 +17,14 @@ pwd
 git clone --branch master --single-branch https://github.com/obsproject/obs-studio.git obs_src
 cd obs_src
 
-git reset --hard 3bc4e8ecbab768b3a700aba2d34fc2364179f6f2
+git reset --hard 27.0.0
 git submodule update --init --recursive
 
 
 mkdir build
 cd build
 # QT 5.14 for OBS 26 compatibility
-QT_VERSION="5.14.1" MACOS_DEPS_VERSION="2020-08-30" TERM="" ../CI/full-build-macos.sh
+QT_VERSION="5.15.2" MACOS_DEPS_VERSION="2021-03-25" TERM="" ../CI/full-build-macos.sh
 cd ..
 
 cd ..

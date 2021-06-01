@@ -17,7 +17,7 @@ pwd
 git clone --branch master --single-branch https://github.com/obsproject/obs-studio.git obs_src
 cd obs_src
 
-git reset --hard 3bc4e8ecbab768b3a700aba2d34fc2364179f6f2
+git reset --hard 27.0.0
 git submodule update --init --recursive
 
 hr "install CI deps"
@@ -26,7 +26,7 @@ hr "install CI deps"
 mkdir build
 cd build
 
-cmake .. -DUNIX_STRUCTURE=1
+cmake .. -DUNIX_STRUCTURE=1 -DENABLE_PIPEWIRE=OFF -DBUILD_BROWSER=OFF
 make -j4
 
 cd ../../
